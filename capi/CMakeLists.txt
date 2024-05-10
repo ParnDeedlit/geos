@@ -10,7 +10,7 @@
 ################################################################################
 
 file(GLOB_RECURSE _headers ${CMAKE_CURRENT_LIST_DIR}/*.cpp  CONFIGURE_DEPEND)
-target_sources(geos_c PRIVATE ${_headers})
+target_sources(geos_c PRIVATE ${_headers} "../include/geos/geom/graphic/GraphicAuxiliary.h" "../include/geos/geom/graphic/GraphicLabel.h" "../include/geos/geom/graphic/GraphicMeasure.h" "../src/geom/graphic/GraphicMeasure.cpp" "../src/geom/graphic/GraphicLabel.cpp")
 unset(_headers)
 
 target_include_directories(geos_c

@@ -20,6 +20,7 @@
 #include <geos/util.h>
 
 #include <geos/geom/Graphic.h>
+#include <geos/geom/graphic/GraphicLayer.h>
 
 // std
 #include <cmath>
@@ -69,34 +70,158 @@ group test_geom_graphic_group("geos::geom::graphic::Graphic");
 // Test Cases
 //
 
-// Test of user's constructor to create non-empty valid Polygon
+// Test of Aree Buffer
 template<>
 template<>
 void object::test<1>
 ()
 {
-    using geos::geom::Coordinate;
-    const double scale = 8680.0;
-    std::fstream input_file("/mnt/d/geos/MIPARE_A_Mercator.geojson");
-    if (!input_file.is_open()) {
-    } else {
-      std::string geojson = std::string((std::istreambuf_iterator<char>(input_file)),
-					std::istreambuf_iterator<char>());
-      geos::io::GeoJSONFeatureCollection features(geojsonreader.readFeatures(geojson));
+    geos::geom::GraphicLayer* layer = new geos::geom::GraphicLayer();
+    layer
+        ->setInputLayer("/mnt/d/geos/MIPARE_A_Mercator.geojson")
+        ->setGraphicAlgorithm(geos::geom::GraphicAlgorithm::Self)
+        ->setGraphicAuxiliary(geos::geom::GraphicAuxiliary::PolygonExteriorRingBuffer)
+        ->setScale(868003)
+        ->excute()
+        ->makeOutputLayer("/mnt/d/geos/output/MIPARE_A_Mercator.geojson")
 
-      const geos::geom::Geometry* geo = features.getFeatures()[0].getGeometry();
-      const geos::geom::Polygon* poly = dynamic_cast<const geos::geom::Polygon*>(geo);
+        ->clear()
 
-      const geos::geom::LinearRing* linearRing = poly->getExteriorRing();
-      std::unique_ptr<geos::geom::Geometry> buffer =  linearRing->buffer(scale * 0.25);
-      std::string result = geojsonwriter.write(buffer.get());
+        ->setInputLayer("/mnt/d/geos/MIPARE_A_Mercator.geojson")
+        ->setGraphicAlgorithm(geos::geom::GraphicAlgorithm::Self)
+        ->setGraphicAuxiliary(geos::geom::GraphicAuxiliary::PolygonExteriorRingBufferExteriorRing)
+        ->setScale(868003)
+        ->excute()
+        ->makeOutputLayer("/mnt/d/geos/output/MIPARE_A_L_Mercator.geojson");
 
-      std::ofstream file("/mnt/d/geos/output/MIPARE_A_Mercator.geojson");
-      if (!file.is_open()) {
-      } else {
-	    file.write(result.c_str(), result.size());
-      }
-    }
+    delete layer;
+}
+
+// Test of Aree Buffer
+template<>
+template<>
+void object::test<2>
+()
+{
+    geos::geom::GraphicLayer* layer = new geos::geom::GraphicLayer();
+    layer
+        ->setInputLayer("/mnt/d/geos/LNDARE_A_Mercator.geojson")
+        ->setGraphicAlgorithm(geos::geom::GraphicAlgorithm::Self)
+        ->setGraphicAuxiliary(geos::geom::GraphicAuxiliary::PolygonExteriorRingBuffer)
+        ->setScale(868003)
+        ->excute()
+        ->makeOutputLayer("/mnt/d/geos/output/LNDARE_A_Mercator.geojson");
+
+     delete layer;
+}
+
+// Test of Line Buffer
+template<>
+template<>
+void object::test<3>
+()
+{
+    geos::geom::GraphicLayer* layer = new geos::geom::GraphicLayer();
+    layer
+        ->setInputLayer("/mnt/d/geos/TSEZNE_A_Mercator.geojson")
+        ->setGraphicAlgorithm(geos::geom::GraphicAlgorithm::Self)
+        ->setGraphicAuxiliary(geos::geom::GraphicAuxiliary::PolygonExteriorRingBuffer)
+        ->setScale(868003)
+        ->excute()
+        ->makeOutputLayer("/mnt/d/geos/output/TSEZNE_A_Mercator.geojson");
+
+    delete layer;
+}
+
+// Test of Aree Clip
+template<>
+template<>
+void object::test<4>
+()
+{
+    geos::geom::GraphicLayer* layer1 = new geos::geom::GraphicLayer();
+    layer1
+        ->setInputLayer("/mnt/d/geos/MIPARE_A_Mercator.geojson")
+        ->setAlgorithmLayer("/mnt/d/geos/output/LNDARE_A_Mercator.geojson")
+        ->setAlgorithmLayer("/mnt/d/geos/TSEZNE_A_Mercator.geojson")
+        ->setAlgorithmLayer("/mnt/d/geos/TSSLPT_A_Mercator.geojson")
+        ->setGraphicAlgorithm(geos::geom::GraphicAlgorithm::OtherDifference)
+        ->setGraphicAuxiliary(geos::geom::GraphicAuxiliary::PolygonExteriorRingBuffer)
+        ->setScale(868003)
+        ->excute()
+        ->makeOutputLayer("/mnt/d/geos/output/MIPARE_A_CLIP_Mercator.geojson");
+    delete layer1;
+}
+
+// Test of Aree Clip
+template<>
+template<>
+void object::test<5>
+()
+{
+    geos::geom::GraphicLayer* layer1 = new geos::geom::GraphicLayer();
+    layer1
+        ->setInputLayer("/mnt/d/geos/MIPARE_A_Mercator.geojson")
+        ->setAlgorithmLayer("/mnt/d/geos/output/LNDARE_A_Mercator.geojson")
+        ->setAlgorithmLayer("/mnt/d/geos/TSEZNE_A_Mercator.geojson")
+        ->setAlgorithmLayer("/mnt/d/geos/TSSLPT_A_Mercator.geojson")
+        ->setGraphicAlgorithm(geos::geom::GraphicAlgorithm::OtherDifference)
+        ->setGraphicAuxiliary(geos::geom::GraphicAuxiliary::PolygonExteriorRingBufferExteriorRing)
+        ->setScale(868003)
+        ->excute()
+        ->makeOutputLayer("/mnt/d/geos/output/MIPARE_A_L_CLIP_Mercator.geojson");
+    delete layer1;
+}
+
+// Test of Area Max Lenth Line
+template<>
+template<>
+void object::test<6>
+()
+{
+    geos::geom::GraphicLayer* layer1 = new geos::geom::GraphicLayer();
+    layer1
+        ->setInputLayer("/mnt/d/geos/SEAARE_A_Mercator.geojson")
+        ->setGraphicAlgorithm(geos::geom::GraphicAlgorithm::Self)
+        ->setGraphicAuxiliary(geos::geom::GraphicAuxiliary::PolygonMaxLength)
+        ->setScale(868003)
+        ->excute()
+        ->makeOutputLayer("/mnt/d/geos/output/SEAARE_A_Mercator.geojson");
+    delete layer1;
+}
+
+// Test of Area Max Lenth Line Center Point
+template<>
+template<>
+void object::test<7>
+()
+{
+    geos::geom::GraphicLayer* layer1 = new geos::geom::GraphicLayer();
+    layer1
+        ->setInputLayer("/mnt/d/geos/SEAARE_A_Mercator.geojson")
+        ->setGraphicAlgorithm(geos::geom::GraphicAlgorithm::Self)
+        ->setGraphicAuxiliary(geos::geom::GraphicAuxiliary::PolygonMaxLengthCenter)
+        ->setScale(868003)
+        ->excute()
+        ->makeOutputLayer("/mnt/d/geos/output/SEAARE_A_LABEL_Mercator.geojson");
+    delete layer1;
+}
+
+// Test of Split RESARE
+template<>
+template<>
+void object::test<8>
+()
+{
+    geos::geom::GraphicLayer* layer1 = new geos::geom::GraphicLayer();
+    layer1
+        ->setInputLayer("/mnt/d/geos/RESARE_A_Mercator.geojson")
+        ->setGraphicAlgorithm(geos::geom::GraphicAlgorithm::SelfSplit)
+        ->setGraphicAuxiliary(geos::geom::GraphicAuxiliary::PolygonSplitExteriorRingAndInteriorRing)
+        ->setScale(868003)
+        ->excute()
+        ->makeOutputLayer("/mnt/d/geos/output/RESARE_A_Mercator.geojson");
+    delete layer1;
 }
 
 } // namespace tut
