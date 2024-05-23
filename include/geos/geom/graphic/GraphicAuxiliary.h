@@ -21,12 +21,24 @@ namespace geos {
             PolygonExteriorRingBuffer = 1,
             /* 区外环 缓冲 生成新的 区的外环线 */
             PolygonExteriorRingBufferExteriorRing = 2,
+            /* 区外环 不缓冲 生成新的 区 */
+            PolygonExteriorRing = 3,
+            /* 区外环 不缓冲 生成新的 区的外环线 */
+            PolygonExteriorRingToExteriorRing = 4,
+            /* 区外环内环 不缓冲 生成新的 区的外环线 */
+            PolygonExteriorRingAndInteriorRingToExteriorRing = 5,
             /* 区内部最大距离线 */
-            PolygonMaxLength = 3,
+            PolygonMaxLength = 6,
             /* 区内部最大距离线中心点 */
-            PolygonMaxLengthCenter = 4,
+            PolygonMaxLengthCenter = 7,
             /* 区内外圈拆分成多个要素 */
-            PolygonSplitExteriorRingAndInteriorRing = 5
+            PolygonSplitExteriorRingAndInteriorRing = 8,
+
+            LineDefault = 9,
+
+            PointDefault = 10,
+            /* 点缓冲生成 新区 */
+            PointBuffer = 11,
         };
 
     } // namespace geos::geom

@@ -9,10 +9,13 @@
 #include <geos/io/GeoJSONReader.h>
 #include <geos/io/GeoJSONWriter.h>
 
+#include <geos/geom/graphic/GraphicFilter.h>
 #include <geos/geom/graphic/GraphicAlgorithm.h>
 #include <geos/geom/graphic/GraphicAuxiliary.h>
 #include <geos/geom/graphic/GraphicMeasure.h>
 #include <geos/geom/graphic/GraphicLabel.h>
+
+#include <geos/algorithm/Orientation.h>
 
 #include <string>
 #include <vector>
@@ -52,7 +55,10 @@ namespace geos {
         class GEOS_DLL GraphicLayer {
 
         public:
-            GraphicLayer() : pm(1.0), factory(GeometryFactory::create(&pm, 0)), geojsonreader(*(factory.get())) {}
+            GraphicLayer() : pm(1.0), factory(GeometryFactory::create(&pm, 0)), geojsonreader(*(factory.get())) {
+                filter = geos::geom::GraphicFilter::FilterAll;
+                algorithmfilter = geos::geom::GraphicFilter::FilterAll;
+            }
 
             /*
              * 设置被计算图层-geojson文件地址uri
@@ -79,6 +85,15 @@ namespace geos {
              */
             GraphicLayer* setAlgorithmLayer(std::vector<geos::io::GeoJSONFeature>&& f);
 
+            /*
+             * 设置过滤模式
+             */
+            GraphicLayer* setGraphicFilter(GraphicFilter fil);
+
+            /*
+             * 设置制图辅助图层过滤模式
+             */
+            GraphicLayer* setGraphicAlgorithmFilter(GraphicFilter fil);
             /*
              * 设置制图算法策略
              */
@@ -139,6 +154,8 @@ namespace geos {
             std::vector<geos::io::GeoJSONFeature> algorithms;
             std::vector<geos::io::GeoJSONFeature> outputs;
 
+            GraphicFilter filter;
+            GraphicFilter algorithmfilter;
             GraphicAlgorithm algorithm;
             GraphicAuxiliary auxiliary;
             GraphicMeasure measure;
@@ -150,6 +167,7 @@ namespace geos {
             geos::io::GeoJSONWriter geojsonwriter;
             std::string outputPath;
             double scale;
+            geos::algorithm::Orientation orientation;
         };
 
     } // namespace geos::geom

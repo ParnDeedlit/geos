@@ -1,22 +1,32 @@
 #include <geos/geom/graphic/GraphicLayer.h>
 
+#include <geos/operation/buffer/BufferOp.h>
+#include <geos/util/IllegalArgumentException.h>
+#include <geos/util.h>
+
 #include <cmath>
 #include <memory>
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <sys/stat.h>
 
 namespace geos {
     namespace geom { // geos::geom
         
         GraphicLayer* GraphicLayer::setInputLayer(std::string geojsonPath) {
            inputs.clear();
-           std::fstream inputFile(geojsonPath);
-           std::string geojson = std::string((std::istreambuf_iterator<char>(inputFile)),
-                std::istreambuf_iterator<char>());
-           inputs = geojsonreader.readFeatures(geojson).getFeatures();
-           inputFile.clear();
-           inputFile.close();
+           struct stat sb;
+
+           if (stat(geojsonPath.c_str(), &sb) == 0) {
+               std::fstream inputFile(geojsonPath);
+               std::string geojson = std::string((std::istreambuf_iterator<char>(inputFile)),
+                   std::istreambuf_iterator<char>());
+               inputs = geojsonreader.readFeatures(geojson).getFeatures();
+               inputFile.clear();
+               inputFile.close();
+           }
+
            return this;
         }
 
@@ -31,17 +41,22 @@ namespace geos {
         }
 
         GraphicLayer* GraphicLayer::setAlgorithmLayer(std::string geojsonPath) {
-            std::fstream inputFile(geojsonPath);
-            std::string geojson = std::string((std::istreambuf_iterator<char>(inputFile)),
-                std::istreambuf_iterator<char>());
-            std::vector<geos::io::GeoJSONFeature> temps = geojsonreader.readFeatures(geojson).getFeatures();
+            struct stat sb;
 
-            for (int i = 0; i < temps.size(); i++) {
-                algorithms.push_back(temps[i]);
+            if (stat(geojsonPath.c_str(), &sb) == 0) {
+                std::fstream inputFile(geojsonPath);
+                std::string geojson = std::string((std::istreambuf_iterator<char>(inputFile)),
+                    std::istreambuf_iterator<char>());
+                std::vector<geos::io::GeoJSONFeature> temps = geojsonreader.readFeatures(geojson).getFeatures();
+
+                for (int i = 0; i < temps.size(); i++) {
+                    algorithms.push_back(temps[i]);
+                }
+
+                inputFile.clear();
+                inputFile.close();
             }
-            
-            inputFile.clear();
-            inputFile.close();
+
             return this;
         }
 
@@ -51,6 +66,16 @@ namespace geos {
         }
 
         GraphicLayer* GraphicLayer::setAlgorithmLayer(std::vector<geos::io::GeoJSONFeature>&& f) {
+            return this;
+        }
+
+        GraphicLayer* GraphicLayer::setGraphicFilter(GraphicFilter fil) {
+            filter = fil;
+            return this;
+        }
+
+        GraphicLayer* GraphicLayer::setGraphicAlgorithmFilter(GraphicFilter fil) {
+            algorithmfilter = fil;
             return this;
         }
 
@@ -74,6 +99,9 @@ namespace geos {
                 excuteInputLayerSplitSelf();
                 break;
             case geos::geom::OtherDifference:
+            case geos::geom::OtherBufferDifference:
+            case geos::geom::OtherUnion:
+            case geos::geom::OtherBufferUnion:
                 excuteInputLayerByAlgorithm();
                 break;
             default:
@@ -90,6 +118,7 @@ namespace geos {
         GraphicLayer* GraphicLayer::excuteInputLayerBySelf() {
             for (int i = 0; i < inputs.size(); i++) {
                 const geos::geom::Geometry* geo = inputs[i].getGeometry();
+                const geos::geom::Point* point;
                 const geos::geom::Polygon* poly;
                 const geos::geom::Polygon* ring;
                 std::unique_ptr <geos::geom::GraphicLabelInfo> labelInfo;
@@ -101,23 +130,44 @@ namespace geos {
                 case geos::geom::AuxiliaryDefault:
                     break;
                 case geos::geom::PolygonExteriorRingBuffer:
-                    poly = dynamic_cast<const geos::geom::Polygon*>(geo);
-                    deal = poly->getExteriorRing()->buffer(scale);
+                    if (geo->getGeometryTypeId() == geos::geom::GEOS_POLYGON) {
+                        poly = dynamic_cast<const geos::geom::Polygon*>(geo);
+                        deal = poly->getExteriorRing()->buffer(scale);
+                    }
+                    else continue;
                     break;
                 case geos::geom::PolygonExteriorRingBufferExteriorRing:
-                    poly = dynamic_cast<const geos::geom::Polygon*>(geo);
-                    deal = poly->getExteriorRing()->buffer(scale);
-                    ring = dynamic_cast<const geos::geom::Polygon*>(deal.get());
-                    deal = ring->getExteriorRing()->clone();
+                    if (geo->getGeometryTypeId() == geos::geom::GEOS_POLYGON) {
+                        poly = dynamic_cast<const geos::geom::Polygon*>(geo);
+                        deal = poly->getExteriorRing()->buffer(scale);
+                        ring = dynamic_cast<const geos::geom::Polygon*>(deal.get());
+                        deal = ring->getExteriorRing()->clone();
+                    }
+                    else continue;
                     break;
                 case geos::geom::PolygonMaxLength:
-                    poly = dynamic_cast<const geos::geom::Polygon*>(geo);
-                    deal = measure.measurePolygonMaxLength(poly);
+                    if (geo->getGeometryTypeId() == geos::geom::GEOS_POLYGON) {
+                        poly = dynamic_cast<const geos::geom::Polygon*>(geo);
+                        deal = measure.measurePolygonMaxLength(poly);
+                    }
+                    else continue;
                     break;
                 case geos::geom::PolygonMaxLengthCenter:
-                    poly = dynamic_cast<const geos::geom::Polygon*>(geo);
-                    labelInfo = graphiclabel.polygonMaxLengthLabel(poly);
-                    deal = labelInfo->fontGeometry->clone();
+                    if (geo->getGeometryTypeId() == geos::geom::GEOS_POLYGON) {
+                        poly = dynamic_cast<const geos::geom::Polygon*>(geo);
+                        labelInfo = graphiclabel.polygonMaxLengthLabel(poly);
+                        deal = labelInfo->fontGeometry->clone();
+                    }
+                    else continue;
+                    break;
+                case geos::geom::PointBuffer:
+                    if (geo->getGeometryTypeId() == geos::geom::GEOS_POINT) {
+                        point = dynamic_cast<const geos::geom::Point*>(geo);
+                        deal = point->buffer(scale);
+                        ring = dynamic_cast<const geos::geom::Polygon*>(deal.get());
+                        deal = ring->clone();
+                    }
+                    else continue;
                     break;
                 default:
                     break;
@@ -157,20 +207,23 @@ namespace geos {
                 switch (auxiliary)
                 {
                 case geos::geom::PolygonSplitExteriorRingAndInteriorRing:
-                    poly = dynamic_cast<const geos::geom::Polygon*>(geo);
-                    deal = poly->getExteriorRing()->clone();
-                    if (deal->isValid()) {
-                        geos::io::GeoJSONFeature feature(deal->clone(), properties);
-                        outputs.push_back(feature);
-                    }
-                    for (int i = 0; i < poly->getNumInteriorRing(); i++) {
-                        deal = poly->getInteriorRingN(i)->clone();
+                    if (geo->getGeometryTypeId() == geos::geom::GEOS_POLYGON) {
+                        poly = dynamic_cast<const geos::geom::Polygon*>(geo);
+                        deal = poly->getExteriorRing()->clone();
                         if (deal->isValid()) {
-                            addProperties(properties, "isLand", true);
                             geos::io::GeoJSONFeature feature(deal->clone(), properties);
                             outputs.push_back(feature);
                         }
+                        for (int i = 0; i < poly->getNumInteriorRing(); i++) {
+                            deal = poly->getInteriorRingN(i)->clone();
+                            if (deal->isValid()) {
+                                addProperties(properties, "isLand", true);
+                                geos::io::GeoJSONFeature feature(deal->clone(), properties);
+                                outputs.push_back(feature);
+                            }
+                        }
                     }
+                    else continue;
                     break;
                 default:
                     break;
@@ -182,52 +235,189 @@ namespace geos {
         GraphicLayer* GraphicLayer::excuteInputLayerByAlgorithm() {
             for (int i = 0; i < inputs.size(); i++) {
                 const geos::geom::Geometry* geo = inputs[i].getGeometry();
+                const geos::geom::Point* point;
+                const geos::geom::LineString* line;
                 const geos::geom::Polygon* poly;
                 const geos::geom::Polygon* ring;
                 std::unique_ptr < geos::geom::GraphicLabelInfo> labelInfo;
                 std::unique_ptr<geos::geom::Geometry> deal;
+                bool isMultiResult = false;
 
+                if (filter == geos::geom::FilterPoint) {
+                    if (geo->getGeometryTypeId() != geos::geom::GEOS_POINT) {
+                        continue;
+                    }
+                } else if (filter == geos::geom::FilterLineString) {
+                    if (geo->getGeometryTypeId() != geos::geom::GEOS_LINESTRING) {
+                        continue;
+                    }
+                } else if (filter == geos::geom::FilterPolygon) {
+                    if (geo->getGeometryTypeId() != geos::geom::GEOS_POLYGON) {
+                        continue;
+                    }
+                }
+
+                // 属性部分
+                std::map<std::string, geos::io::GeoJSONValue> properties = inputs[i].getProperties();
+
+                // 几何部分
                 switch (auxiliary)
                 {
                 case geos::geom::AuxiliaryDefault:
                     break;
                 case geos::geom::PolygonExteriorRingBuffer:
-                    poly = dynamic_cast<const geos::geom::Polygon*>(geo);
-                    deal = poly->getExteriorRing()->buffer(scale);
+                    if (geo->getGeometryTypeId() == geos::geom::GEOS_POLYGON) {
+                        poly = dynamic_cast<const geos::geom::Polygon*>(geo);
+                        deal = poly->getExteriorRing()->buffer(scale, 0, geos::operation::buffer::BufferOp::CAP_SQUARE);
+                    }
+                    else continue;
                     break;
                 case geos::geom::PolygonExteriorRingBufferExteriorRing:
-                    poly = dynamic_cast<const geos::geom::Polygon*>(geo);
-                    deal = poly->getExteriorRing()->buffer(scale);
-                    ring = dynamic_cast<const geos::geom::Polygon*>(deal.get());
-                    deal = ring->getExteriorRing()->clone();
+                    if (geo->getGeometryTypeId() == geos::geom::GEOS_POLYGON) {
+                        poly = dynamic_cast<const geos::geom::Polygon*>(geo);
+                        deal = poly->getExteriorRing()->buffer(scale, 0, geos::operation::buffer::BufferOp::CAP_SQUARE);
+                        ring = dynamic_cast<const geos::geom::Polygon*>(deal.get());
+                        if (orientation.isCCW(ring->getExteriorRing()->getCoordinates().get())) {
+                            deal = ring->getExteriorRing()->reverse()->clone();
+                        }
+                        else {
+                            deal = ring->getExteriorRing()->clone();
+                        }
+                    }
+                    else continue;
+                    break;
+                case geos::geom::PolygonExteriorRing:
+                    if (geo->getGeometryTypeId() == geos::geom::GEOS_POLYGON) {
+                        poly = dynamic_cast<const geos::geom::Polygon*>(geo);
+                        deal = poly->getExteriorRing()->buffer(1, 0, geos::operation::buffer::BufferOp::CAP_SQUARE);
+                    }
+                    else continue;
+                    break;
+                case geos::geom::PolygonExteriorRingToExteriorRing:
+                    if (geo->getGeometryTypeId() == geos::geom::GEOS_POLYGON) {
+                        poly = dynamic_cast<const geos::geom::Polygon*>(geo);
+                        deal = poly->getExteriorRing()->buffer(1, 0, geos::operation::buffer::BufferOp::CAP_SQUARE);
+                        ring = dynamic_cast<const geos::geom::Polygon*>(deal.get());
+                        if (orientation.isCCW(ring->getExteriorRing()->getCoordinates().get())) {
+                            deal = ring->getExteriorRing()->reverse()->clone();
+                        }
+                        else {
+                            deal = ring->getExteriorRing()->clone();
+                        }
+                    }
+                    else continue;
+                    break;
+                case geos::geom::PolygonExteriorRingAndInteriorRingToExteriorRing:
+                    if (geo->getGeometryTypeId() == geos::geom::GEOS_POLYGON) {
+                        isMultiResult = true;
+                        poly = dynamic_cast<const geos::geom::Polygon*>(geo);
+                        deal = poly->getExteriorRing()->clone();
+                        if (deal->isValid()) {
+                            if (algorithm == geos::geom::OtherDifference) {
+                                for (int j = 0; j < algorithms.size(); j++) {
+                                    deal = deal->difference(algorithms[j].getGeometry());
+                                }
+                            }
+                            geos::io::GeoJSONFeature feature(deal->clone(), properties);
+                            outputs.push_back(feature);
+                        }
+                        for (int i = 0; i < poly->getNumInteriorRing(); i++) {
+                            deal = poly->getInteriorRingN(i)->clone();
+                            if (deal->isValid()) {
+                                if (algorithm == geos::geom::OtherDifference) {
+                                    for (int j = 0; j < algorithms.size(); j++) {
+                                        deal = deal->difference(algorithms[j].getGeometry());
+                                    }
+                                }
+                                addProperties(properties, "isTopoLink", true);
+                                geos::io::GeoJSONFeature feature(deal->clone(), properties);
+                                outputs.push_back(feature);
+                            }
+                        }
+                    }
+                    else continue;
                     break;
                 case geos::geom::PolygonMaxLength:
-                    poly = dynamic_cast<const geos::geom::Polygon*>(geo);
-                    deal = measure.measurePolygonMaxLength(poly);
+                    if (geo->getGeometryTypeId() == geos::geom::GEOS_POLYGON) {
+                        poly = dynamic_cast<const geos::geom::Polygon*>(geo);
+                        deal = measure.measurePolygonMaxLength(poly);
+                    }
+                    else continue;
                     break;
                 case geos::geom::PolygonMaxLengthCenter:
-                    poly = dynamic_cast<const geos::geom::Polygon*>(geo);
-                    labelInfo = graphiclabel.polygonMaxLengthLabel(poly);
-                    deal = labelInfo->fontGeometry->clone();
+                    if (geo->getGeometryTypeId() == geos::geom::GEOS_POLYGON) {
+                        poly = dynamic_cast<const geos::geom::Polygon*>(geo);
+                        labelInfo = graphiclabel.polygonMaxLengthLabel(poly);
+                        deal = labelInfo->fontGeometry->clone();
+                    }
+                    else continue;
+                    break;
+                case geos::geom::LineDefault:
+                    if (geo->getGeometryTypeId() == geos::geom::GEOS_LINESTRING) {
+                        line = dynamic_cast<const geos::geom::LineString*>(geo);
+                        deal = line->clone();
+                    }
+                    else continue;
+                    break;
+                case geos::geom::PointDefault:
+                    if (geo->getGeometryTypeId() == geos::geom::GEOS_POINT) {
+                        point = dynamic_cast<const geos::geom::Point*>(geo);
+                        deal = point->clone();
+                    }
+                    else continue;
+                    break;
+                case geos::geom::PointBuffer:
+                    if (geo->getGeometryTypeId() == geos::geom::GEOS_POINT) {
+                        point = dynamic_cast<const geos::geom::Point*>(geo);
+                        deal = point->buffer(scale);
+                    }
+                    else continue;
                     break;
                 default:
                     break;
                 }
 
-                for (int j = 0; j < algorithms.size(); j++) {
-                    switch (algorithm)
-                    {
-                    case geos::geom::OtherDifference:
-                        deal = deal->difference(algorithms[j].getGeometry());
-                        break;
-                    default:
-                        break;
-                    }
+                if (deal == nullptr || !deal->isValid()) {
+                    continue;
                 }
 
-                std::map<std::string, geos::io::GeoJSONValue> properties = inputs[i].getProperties();
-                geos::io::GeoJSONFeature feature(deal->clone(), properties);
-                outputs.push_back(feature);
+                if (!isMultiResult) {
+                    for (int j = 0; j < algorithms.size(); j++) {
+                        if (algorithmfilter == geos::geom::FilterPoint) {
+                            if (algorithms[j].getGeometry()->getGeometryTypeId() != geos::geom::GEOS_POINT) {
+                                continue;
+                            }
+                        }
+                        else if (algorithmfilter == geos::geom::FilterLineString) {
+                            if (algorithms[j].getGeometry()->getGeometryTypeId() != geos::geom::GEOS_LINESTRING) {
+                                continue;
+                            }
+                        }
+                        else if (algorithmfilter == geos::geom::FilterPolygon) {
+                            if (algorithms[j].getGeometry()->getGeometryTypeId() != geos::geom::GEOS_POLYGON) {
+                                continue;
+                            }
+                        }
+
+                        if (algorithm == geos::geom::OtherDifference) {
+                            deal = deal->difference(algorithms[j].getGeometry());
+                        }
+                        else if (algorithm == geos::geom::OtherBufferDifference) {
+                            deal = deal->difference(algorithms[j].getGeometry()->buffer(scale)->clone().get());
+                        }
+                        else if (algorithm == geos::geom::OtherUnion) {
+                            deal = deal->Union(algorithms[j].getGeometry());
+                        }
+                        else if (algorithm == geos::geom::OtherBufferUnion) {
+                            deal = deal->Union(algorithms[j].getGeometry()->buffer(scale)->clone().get());
+                        }
+                    }
+
+                    if (deal != nullptr && deal->isValid()) {
+                        geos::io::GeoJSONFeature feature(deal->clone(), properties);
+                        outputs.push_back(feature);
+                    }
+                }
             }
 
             return this;

@@ -78,21 +78,21 @@ void object::test<1>
 {
     geos::geom::GraphicLayer* layer = new geos::geom::GraphicLayer();
     layer
-        ->setInputLayer("/mnt/d/geos/MIPARE_A_Mercator.geojson")
+        ->setInputLayer("/mnt/d/geos/Polygon_MIPARE.geojson")
         ->setGraphicAlgorithm(geos::geom::GraphicAlgorithm::Self)
         ->setGraphicAuxiliary(geos::geom::GraphicAuxiliary::PolygonExteriorRingBuffer)
         ->setScale(868003)
         ->excute()
-        ->makeOutputLayer("/mnt/d/geos/output/MIPARE_A_Mercator.geojson")
+        ->makeOutputLayer("/mnt/d/geos/output/Polygon_MIPARE.geojson")
 
         ->clear()
 
-        ->setInputLayer("/mnt/d/geos/MIPARE_A_Mercator.geojson")
+        ->setInputLayer("/mnt/d/geos/Polygon_MIPARE.geojson")
         ->setGraphicAlgorithm(geos::geom::GraphicAlgorithm::Self)
         ->setGraphicAuxiliary(geos::geom::GraphicAuxiliary::PolygonExteriorRingBufferExteriorRing)
         ->setScale(868003)
         ->excute()
-        ->makeOutputLayer("/mnt/d/geos/output/MIPARE_A_L_Mercator.geojson");
+        ->makeOutputLayer("/mnt/d/geos/output/Polygon_Outline_MIPARE.geojson");
 
     delete layer;
 }
@@ -105,12 +105,12 @@ void object::test<2>
 {
     geos::geom::GraphicLayer* layer = new geos::geom::GraphicLayer();
     layer
-        ->setInputLayer("/mnt/d/geos/LNDARE_A_Mercator.geojson")
+        ->setInputLayer("/mnt/d/geos/Polygon_LNDARE.geojson")
         ->setGraphicAlgorithm(geos::geom::GraphicAlgorithm::Self)
         ->setGraphicAuxiliary(geos::geom::GraphicAuxiliary::PolygonExteriorRingBuffer)
         ->setScale(868003)
         ->excute()
-        ->makeOutputLayer("/mnt/d/geos/output/LNDARE_A_Mercator.geojson");
+        ->makeOutputLayer("/mnt/d/geos/output/Polygon_LNDARE.geojson");
 
      delete layer;
 }
@@ -123,12 +123,12 @@ void object::test<3>
 {
     geos::geom::GraphicLayer* layer = new geos::geom::GraphicLayer();
     layer
-        ->setInputLayer("/mnt/d/geos/TSEZNE_A_Mercator.geojson")
+        ->setInputLayer("/mnt/d/geos/Polygon_TSEZNE.geojson")
         ->setGraphicAlgorithm(geos::geom::GraphicAlgorithm::Self)
         ->setGraphicAuxiliary(geos::geom::GraphicAuxiliary::PolygonExteriorRingBuffer)
         ->setScale(868003)
         ->excute()
-        ->makeOutputLayer("/mnt/d/geos/output/TSEZNE_A_Mercator.geojson");
+        ->makeOutputLayer("/mnt/d/geos/output/Polygon_TSEZNE.geojson");
 
     delete layer;
 }
@@ -141,15 +141,16 @@ void object::test<4>
 {
     geos::geom::GraphicLayer* layer1 = new geos::geom::GraphicLayer();
     layer1
-        ->setInputLayer("/mnt/d/geos/MIPARE_A_Mercator.geojson")
-        ->setAlgorithmLayer("/mnt/d/geos/output/LNDARE_A_Mercator.geojson")
-        ->setAlgorithmLayer("/mnt/d/geos/TSEZNE_A_Mercator.geojson")
-        ->setAlgorithmLayer("/mnt/d/geos/TSSLPT_A_Mercator.geojson")
+        ->setInputLayer("/mnt/d/geos/Polygon_MIPARE.geojson")
+        ->setAlgorithmLayer("/mnt/d/geos/Polygon_OBSTRN.geojson")
+        ->setAlgorithmLayer("/mnt/d/geos/output/Polygon_LNDARE.geojson")
+        ->setAlgorithmLayer("/mnt/d/geos/Polygon_TSEZNE.geojson")
+        ->setAlgorithmLayer("/mnt/d/geos/Polygon_TSSLPT.geojson")
         ->setGraphicAlgorithm(geos::geom::GraphicAlgorithm::OtherDifference)
         ->setGraphicAuxiliary(geos::geom::GraphicAuxiliary::PolygonExteriorRingBuffer)
         ->setScale(868003)
         ->excute()
-        ->makeOutputLayer("/mnt/d/geos/output/MIPARE_A_CLIP_Mercator.geojson");
+        ->makeOutputLayer("/mnt/d/geos/output/Polygon_Clip_MIPARE.geojson");
     delete layer1;
 }
 
@@ -161,15 +162,16 @@ void object::test<5>
 {
     geos::geom::GraphicLayer* layer1 = new geos::geom::GraphicLayer();
     layer1
-        ->setInputLayer("/mnt/d/geos/MIPARE_A_Mercator.geojson")
-        ->setAlgorithmLayer("/mnt/d/geos/output/LNDARE_A_Mercator.geojson")
-        ->setAlgorithmLayer("/mnt/d/geos/TSEZNE_A_Mercator.geojson")
-        ->setAlgorithmLayer("/mnt/d/geos/TSSLPT_A_Mercator.geojson")
+        ->setInputLayer("/mnt/d/geos/Polygon_MIPARE.geojson")
+        ->setAlgorithmLayer("/mnt/d/geos/Polygon_OBSTRN.geojson")
+        ->setAlgorithmLayer("/mnt/d/geos/output/Polygon_LNDARE.geojson")
+        ->setAlgorithmLayer("/mnt/d/geos/Polygon_TSEZNE.geojson")
+        ->setAlgorithmLayer("/mnt/d/geos/Polygon_TSSLPT.geojson")
         ->setGraphicAlgorithm(geos::geom::GraphicAlgorithm::OtherDifference)
         ->setGraphicAuxiliary(geos::geom::GraphicAuxiliary::PolygonExteriorRingBufferExteriorRing)
         ->setScale(868003)
         ->excute()
-        ->makeOutputLayer("/mnt/d/geos/output/MIPARE_A_L_CLIP_Mercator.geojson");
+        ->makeOutputLayer("/mnt/d/geos/output/Polygon_Outline_Clip_MIPARE.geojson");
     delete layer1;
 }
 
@@ -181,12 +183,12 @@ void object::test<6>
 {
     geos::geom::GraphicLayer* layer1 = new geos::geom::GraphicLayer();
     layer1
-        ->setInputLayer("/mnt/d/geos/SEAARE_A_Mercator.geojson")
+        ->setInputLayer("/mnt/d/geos/Polygon_SEAARE.geojson")
         ->setGraphicAlgorithm(geos::geom::GraphicAlgorithm::Self)
         ->setGraphicAuxiliary(geos::geom::GraphicAuxiliary::PolygonMaxLength)
         ->setScale(868003)
         ->excute()
-        ->makeOutputLayer("/mnt/d/geos/output/SEAARE_A_Mercator.geojson");
+        ->makeOutputLayer("/mnt/d/geos/output/Polygon_SEAARE.geojson");
     delete layer1;
 }
 
@@ -198,12 +200,12 @@ void object::test<7>
 {
     geos::geom::GraphicLayer* layer1 = new geos::geom::GraphicLayer();
     layer1
-        ->setInputLayer("/mnt/d/geos/SEAARE_A_Mercator.geojson")
+        ->setInputLayer("/mnt/d/geos/Polygon_SEAARE.geojson")
         ->setGraphicAlgorithm(geos::geom::GraphicAlgorithm::Self)
         ->setGraphicAuxiliary(geos::geom::GraphicAuxiliary::PolygonMaxLengthCenter)
         ->setScale(868003)
         ->excute()
-        ->makeOutputLayer("/mnt/d/geos/output/SEAARE_A_LABEL_Mercator.geojson");
+        ->makeOutputLayer("/mnt/d/geos/output/Polygon_Label_SEAARE.geojson");
     delete layer1;
 }
 
@@ -215,12 +217,118 @@ void object::test<8>
 {
     geos::geom::GraphicLayer* layer1 = new geos::geom::GraphicLayer();
     layer1
-        ->setInputLayer("/mnt/d/geos/RESARE_A_Mercator.geojson")
-        ->setGraphicAlgorithm(geos::geom::GraphicAlgorithm::SelfSplit)
-        ->setGraphicAuxiliary(geos::geom::GraphicAuxiliary::PolygonSplitExteriorRingAndInteriorRing)
+        ->setInputLayer("/mnt/d/geos/Polygon_RESARE.geojson")
+        ->setAlgorithmLayer("/mnt/d/geos/Polygon_LNDARE.geojson")
+        ->setAlgorithmLayer("/mnt/d/geos/Polygon_OBSTRN.geojson")
+        ->setAlgorithmLayer("/mnt/d/geos/Polygon_TSEZNE.geojson")
+        ->setAlgorithmLayer("/mnt/d/geos/Polygon_TSSLPT.geojson")
+        ->setGraphicAlgorithm(geos::geom::GraphicAlgorithm::OtherDifference)
+        ->setGraphicAuxiliary(geos::geom::GraphicAuxiliary::PolygonExteriorRingAndInteriorRingToExteriorRing)
         ->setScale(868003)
         ->excute()
-        ->makeOutputLayer("/mnt/d/geos/output/RESARE_A_Mercator.geojson");
+        ->makeOutputLayer("/mnt/d/geos/output/LineString_RESARE.geojson");
+    delete layer1;
+}
+
+// Test of Aree Clip
+template<>
+template<>
+void object::test<9>
+()
+{
+    geos::geom::GraphicLayer* layer1 = new geos::geom::GraphicLayer();
+    layer1
+        ->setInputLayer("/mnt/d/geos/Polygon_CTNARE.geojson")
+        ->setAlgorithmLayer("/mnt/d/geos/Polygon_LNDARE.geojson")
+        ->setAlgorithmLayer("/mnt/d/geos/Polygon_OBSTRN.geojson")
+        ->setAlgorithmLayer("/mnt/d/geos/Polygon_TSEZNE.geojson")
+        ->setGraphicAlgorithm(geos::geom::GraphicAlgorithm::OtherDifference)
+        ->setGraphicAuxiliary(geos::geom::GraphicAuxiliary::PolygonExteriorRingAndInteriorRingToExteriorRing)
+        ->setScale(868003)
+        ->excute()
+        ->makeOutputLayer("/mnt/d/geos/output/Polygon_Outline_Clip_CTNARE.geojson");
+    delete layer1;
+}
+
+// Test of Aree Clip
+template<>
+template<>
+void object::test<10>
+()
+{
+    geos::geom::GraphicLayer* layer1 = new geos::geom::GraphicLayer();
+    layer1
+        ->setInputLayer("/mnt/d/geos/Polygon_PRCARE.geojson")
+        ->setAlgorithmLayer("/mnt/d/geos/Polygon_LNDARE.geojson")
+        ->setAlgorithmLayer("/mnt/d/geos/Polygon_OBSTRN.geojson")
+        ->setAlgorithmLayer("/mnt/d/geos/Polygon_TSEZNE.geojson")
+        ->setAlgorithmLayer("/mnt/d/geos/Polygon_TSSLPT.geojson")
+        ->setGraphicAlgorithm(geos::geom::GraphicAlgorithm::OtherDifference)
+        ->setGraphicAuxiliary(geos::geom::GraphicAuxiliary::PolygonExteriorRingToExteriorRing)
+        ->setScale(868003)
+        ->excute()
+        ->makeOutputLayer("/mnt/d/geos/output/Polygon_Outline_Clip_PRCARE.geojson");
+    delete layer1;
+}
+
+// Test of Line Clip
+template<>
+template<>
+void object::test<11>
+()
+{
+    geos::geom::GraphicLayer* layer1 = new geos::geom::GraphicLayer();
+    layer1
+        ->setInputLayer("/mnt/d/geos/Point_RDOSTA.geojson")
+        ->setGraphicAlgorithm(geos::geom::GraphicAlgorithm::Self)
+        ->setGraphicAuxiliary(geos::geom::GraphicAuxiliary::PointBuffer)
+        ->setScale(2 * 868003)
+        ->excute()
+        ->makeOutputLayer("/mnt/d/geos/output/Point_RDOSTA.geojson");
+    delete layer1;
+}
+
+
+// Test of Line Clip
+template<>
+template<>
+void object::test<12>
+()
+{
+    geos::geom::GraphicLayer* layer1 = new geos::geom::GraphicLayer();
+    layer1
+        ->setInputLayer("/mnt/d/geos/LineString_COALNE.geojson")
+        ->setGraphicAuxiliary(geos::geom::GraphicAuxiliary::LineDefault)
+        ->setAlgorithmLayer("/mnt/d/geos/Point_RDOSTA.geojson")
+        ->setAlgorithmLayer("/mnt/d/geos/Point_BUISGL.geojson")
+        ->setAlgorithmLayer("/mnt/d/geos/Point_UWTROC.geojson")
+        ->setAlgorithmLayer("/mnt/d/geos/Point_BCNLAT.geojson")
+        ->setAlgorithmLayer("/mnt/d/geos/Point_BCNSPP.geojson")
+        ->setGraphicAlgorithm(geos::geom::GraphicAlgorithm::OtherBufferDifference)
+        ->setScale(2 * 868003)
+        ->excute()
+        ->makeOutputLayer("/mnt/d/geos/output/LineString_Clip_COALNE.geojson");
+    delete layer1;
+}
+
+
+// Test of Point Union
+template<>
+template<>
+void object::test<13>
+()
+{
+    geos::geom::GraphicLayer* layer1 = new geos::geom::GraphicLayer();
+    layer1
+        ->setInputLayer("/mnt/d/geos/Point_OBSTRN.geojson")
+        ->setAlgorithmLayer("/mnt/d/geos/Point_OBSTRN.geojson")
+        ->setGraphicFilter(geos::geom::GraphicFilter::FilterPoint)
+        ->setGraphicAlgorithmFilter(geos::geom::GraphicFilter::FilterPoint)
+        ->setGraphicAlgorithm(geos::geom::GraphicAlgorithm::OtherBufferUnion)
+        ->setGraphicAuxiliary(geos::geom::GraphicAuxiliary::PointBuffer)
+        ->setScale(868003)
+        ->excute()
+        ->makeOutputLayer("/mnt/d/geos/output/Point_Outline_Union_OBSTRN.geojson");
     delete layer1;
 }
 

@@ -23,7 +23,12 @@ namespace geos {
             /* 当前图层 基于 其他图层 生成新的图层 */
             /* 区别部分 = 当前几何部分 - 求交部分 */
             OtherDifference = 2,
-
+            /* 区别部分 = 当前几何部分 - 其他图层缓冲后求交部分 */
+            OtherBufferDifference = 3,
+            /* 求并部分 = 当前几何部分 + 其他图层部分 */
+            OtherUnion = 4,
+            /* 求并部分 = 当前几何部分 + 其他图层部分缓冲 */
+            OtherBufferUnion = 5
         };
 
     } // namespace geos::geom

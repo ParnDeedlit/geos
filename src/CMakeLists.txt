@@ -9,7 +9,7 @@
 # See the COPYING file for more information.
 ################################################################################
 file(GLOB_RECURSE _sources ${CMAKE_CURRENT_LIST_DIR}/*.cpp  CONFIGURE_DEPEND)
-target_sources(geos PRIVATE ${_sources} "../include/geos/geom/graphic/GraphicAuxiliary.h" "../include/geos/geom/graphic/GraphicLabel.h" "../include/geos/geom/graphic/GraphicMeasure.h" "geom/graphic/GraphicMeasure.cpp" "geom/graphic/GraphicLabel.cpp")
+target_sources(geos PRIVATE ${_sources} "../include/geos/geom/graphic/GraphicAuxiliary.h" "../include/geos/geom/graphic/GraphicLabel.h" "../include/geos/geom/graphic/GraphicMeasure.h" "geom/graphic/GraphicMeasure.cpp" "geom/graphic/GraphicLabel.cpp" "../include/geos/geom/graphic/GraphicFilter.h")
 unset(_sources)
 
 add_subdirectory(deps)
