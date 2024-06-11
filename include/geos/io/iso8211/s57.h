@@ -205,7 +205,7 @@ public:
   void Rewind();
   // OGRFeature *ReadNextFeature(OGRFeatureDefn * = NULL);
   // OGRFeature *ReadFeature(int nFID, OGRFeatureDefn * = NULL);
-  OGRFeature *ReadVector(int nFID, int nRCNM);
+  // OGRFeature *ReadVector(int nFID, int nRCNM);
 
   int GetNextFEIndex(int nRCNM = 100);
   void SetNextFEIndex(int nNewIndex, int nRCNM = 100);

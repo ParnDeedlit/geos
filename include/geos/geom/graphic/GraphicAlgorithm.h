@@ -25,10 +25,12 @@ namespace geos {
             OtherDifference = 2,
             /* 区别部分 = 当前几何部分 - 其他图层缓冲后求交部分 */
             OtherBufferDifference = 3,
+            /* 区别部分 = 当前几何部分 - 其他图层移动后求交部分 */
+            OtherTranslateDifference = 4,
             /* 求并部分 = 当前几何部分 + 其他图层部分 */
-            OtherUnion = 4,
+            OtherUnion = 5,
             /* 求并部分 = 当前几何部分 + 其他图层部分缓冲 */
-            OtherBufferUnion = 5
+            OtherBufferUnion = 6
         };
 
     } // namespace geos::geom

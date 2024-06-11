@@ -1,8 +1,14 @@
 #include <geos/geom/graphic/GraphicLayer.h>
+#include <geos/geom/graphic/GraphicTranslateFilter.h>
 
 #include <geos/operation/buffer/BufferOp.h>
 #include <geos/util/IllegalArgumentException.h>
 #include <geos/util.h>
+
+#include <geos/geom/Geometry.h>
+#include <geos/geom/Coordinate.h>
+#include <geos/geom/PrecisionModel.h>
+#include <geos/geom/GeometryFactory.h>
 
 #include <cmath>
 #include <memory>
@@ -102,6 +108,7 @@ namespace geos {
             case geos::geom::OtherBufferDifference:
             case geos::geom::OtherUnion:
             case geos::geom::OtherBufferUnion:
+            case geos::geom::OtherTranslateDifference:
                 excuteInputLayerByAlgorithm();
                 break;
             default:
@@ -123,6 +130,22 @@ namespace geos {
                 const geos::geom::Polygon* ring;
                 std::unique_ptr <geos::geom::GraphicLabelInfo> labelInfo;
                 std::unique_ptr<geos::geom::Geometry> deal;
+
+                if (filter == geos::geom::FilterPoint) {
+                    if (geo->getGeometryTypeId() != geos::geom::GEOS_POINT) {
+                        continue;
+                    }
+                }
+                else if (filter == geos::geom::FilterLineString) {
+                    if (geo->getGeometryTypeId() != geos::geom::GEOS_LINESTRING) {
+                        continue;
+                    }
+                }
+                else if (filter == geos::geom::FilterPolygon) {
+                    if (geo->getGeometryTypeId() != geos::geom::GEOS_POLYGON) {
+                        continue;
+                    }
+                }
 
                 // 几何部分
                 switch (auxiliary)
@@ -164,8 +187,6 @@ namespace geos {
                     if (geo->getGeometryTypeId() == geos::geom::GEOS_POINT) {
                         point = dynamic_cast<const geos::geom::Point*>(geo);
                         deal = point->buffer(scale);
-                        ring = dynamic_cast<const geos::geom::Polygon*>(deal.get());
-                        deal = ring->clone();
                     }
                     else continue;
                     break;
@@ -183,6 +204,11 @@ namespace geos {
                         addProperties(properties, labelInfo->fontSizeField, fontSize);
                     }
                 }
+
+                if (deal == nullptr || !deal->isValid()) {
+                    continue;
+                }
+
                 if (deal->isValid()) {
                     geos::io::GeoJSONFeature feature(deal->clone(), properties);
                     outputs.push_back(feature);
@@ -233,6 +259,7 @@ namespace geos {
         }
 
         GraphicLayer* GraphicLayer::excuteInputLayerByAlgorithm() {
+            CoordinateFilter* translate = new GraphicTranslateFilter(translatex, translatey);
             for (int i = 0; i < inputs.size(); i++) {
                 const geos::geom::Geometry* geo = inputs[i].getGeometry();
                 const geos::geom::Point* point;
@@ -352,6 +379,21 @@ namespace geos {
                     }
                     else continue;
                     break;
+                case geos::geom::PolygonDefault:
+                    if (geo->getGeometryTypeId() == geos::geom::GEOS_POLYGON) {
+                        poly = dynamic_cast<const geos::geom::Polygon*>(geo);
+                        deal = poly->clone();
+                    }
+                    else continue;
+                    break;
+                case geos::geom::PolygonTranslate:
+                    if (geo->getGeometryTypeId() == geos::geom::GEOS_POLYGON) {
+                        poly = dynamic_cast<const geos::geom::Polygon*>(geo);
+                        deal = poly->clone();
+                        deal->apply_rw(translate);
+                    }
+                    else continue;
+                    break;
                 case geos::geom::LineDefault:
                     if (geo->getGeometryTypeId() == geos::geom::GEOS_LINESTRING) {
                         line = dynamic_cast<const geos::geom::LineString*>(geo);
@@ -405,6 +447,10 @@ namespace geos {
                         else if (algorithm == geos::geom::OtherBufferDifference) {
                             deal = deal->difference(algorithms[j].getGeometry()->buffer(scale)->clone().get());
                         }
+                        else if (algorithm == geos::geom::OtherTranslateDifference) {
+                            algorithms[j].getGeometry()->apply_ro(translate);
+                            deal = deal->difference(algorithms[j].getGeometry());
+                        }
                         else if (algorithm == geos::geom::OtherUnion) {
                             deal = deal->Union(algorithms[j].getGeometry());
                         }
@@ -419,7 +465,7 @@ namespace geos {
                     }
                 }
             }
-
+            delete translate;
             return this;
         }
 
@@ -443,6 +489,12 @@ namespace geos {
 
         GraphicLayer* GraphicLayer::setScale(double s) {
             scale = s / 1000;
+            return this;
+        }
+
+        GraphicLayer* GraphicLayer::setTranslate(double x, double y) {
+            translatex = x;
+            translatey = y;
             return this;
         }
 

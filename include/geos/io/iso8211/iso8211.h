@@ -29,7 +29,7 @@
  *
  * $Log: iso8211.h,v $
  * Revision 1.20  2005/12/08 20:22:24  fwarmerdam
- * use CPL_ODLL to optionally export ISO8211lib api
+ * use GEOS_DLL to optionally export ISO8211lib api
  *
  * Revision 1.19  2004/01/06 18:59:18  warmerda
  * make enum identifiers more unique
@@ -93,6 +93,7 @@
 #ifndef _ISO8211_H_INCLUDED
 #define _ISO8211_H_INCLUDED
 
+#include <geos/export.h>
 #include <geos/io/iso8211/cpl_port.h>
 
 /**
@@ -110,9 +111,9 @@ typedef enum {
 /*      mostly conveniences.                                            */
 /************************************************************************/
 
-long CPL_ODLL DDFScanInt( const char *pszString, int nMaxChars );
-int  CPL_ODLL DDFScanVariable( const char * pszString, int nMaxChars, int nDelimChar );
-char CPL_ODLL *DDFFetchVariable( const char *pszString, int nMaxChars,
+long DDFScanInt( const char *pszString, int nMaxChars );
+int  DDFScanVariable( const char * pszString, int nMaxChars, int nDelimChar );
+char *DDFFetchVariable( const char *pszString, int nMaxChars,
                         int nDelimChar1, int nDelimChar2,
                         int *pnConsumedChars );
 
@@ -123,10 +124,10 @@ char CPL_ODLL *DDFFetchVariable( const char *pszString, int nMaxChars,
 /*                           Predeclarations                            */
 /************************************************************************/
 
-class DDFFieldDefn;
-class DDFSubfieldDefn;
-class DDFRecord;
-class DDFField;
+class GEOS_DLL DDFFieldDefn;
+class GEOS_DLL DDFSubfieldDefn;
+class GEOS_DLL DDFRecord;
+class GEOS_DLL DDFField;
 
 /************************************************************************/
 /*                              DDFModule                               */
@@ -139,7 +140,7 @@ class DDFField;
 
 */  
 
-class CPL_ODLL DDFModule
+class __declspec(dllexport) CPL_DLL DDFModule
 {
   public:
                 DDFModule();
@@ -208,6 +209,18 @@ class CPL_ODLL DDFModule
     int         nCloneCount;
     int         nMaxCloneCount;
     DDFRecord   **papoClones;
+public:
+   /* DDFModule(FILE* fpDDF, int bReadOnly, long nFirstRecordOffset, char _interchangeLevel, char _inlineCodeExtensionIndicator, char _versionNumber, char _appIndicator, int _fieldControlLength, char[4] _extendedCharSet, long _recLength, char _leaderIden, long _fieldAreaStart, long _sizeFieldLength, long _sizeFieldPos, long _sizeFieldTag, int nFieldDefnCount, DDFFieldDefn** papoFieldDefns, DDFRecord* poRecord, int nCloneCount, int nMaxCloneCount, DDFRecord** papoClones)
+        : fpDDF(fpDDF), bReadOnly(bReadOnly), nFirstRecordOffset(nFirstRecordOffset), _interchangeLevel(_interchangeLevel), _inlineCodeExtensionIndicator(_inlineCodeExtensionIndicator), _versionNumber(_versionNumber), _appIndicator(_appIndicator), _fieldControlLength(_fieldControlLength), _extendedCharSet(_extendedCharSet), _recLength(_recLength), _leaderIden(_leaderIden), _fieldAreaStart(_fieldAreaStart), _sizeFieldLength(_sizeFieldLength), _sizeFieldPos(_sizeFieldPos), _sizeFieldTag(_sizeFieldTag), nFieldDefnCount(nFieldDefnCount), papoFieldDefns(papoFieldDefns), poRecord(poRecord), nCloneCount(nCloneCount), nMaxCloneCount(nMaxCloneCount), papoClones(papoClones);*/
+    /*DDFModule(FILE* fpDDF, int bReadOnly, long nFirstRecordOffset, char _interchangeLevel, char _inlineCodeExtensionIndicator,
+        char _versionNumber, char _appIndicator, int _fieldControlLength, char[4] _extendedCharSet, long _recLength,
+        char _leaderIden, long _fieldAreaStart, long _sizeFieldLength, long _sizeFieldPos, long _sizeFieldTag,
+        int nFieldDefnCount, DDFFieldDefn** papoFieldDefns, DDFRecord* poRecord, int nCloneCount, int nMaxCloneCount, DDFRecord** papoClones)
+        : fpDDF(fpDDF), bReadOnly(bReadOnly), nFirstRecordOffset(nFirstRecordOffset), _interchangeLevel(_interchangeLevel),
+        _inlineCodeExtensionIndicator(_inlineCodeExtensionIndicator), _versionNumber(_versionNumber), _appIndicator(_appIndicator),
+        _fieldControlLength(_fieldControlLength), _extendedCharSet(_extendedCharSet), _recLength(_recLength), _leaderIden(_leaderIden),
+        _fieldAreaStart(_fieldAreaStart), _sizeFieldLength(_sizeFieldLength), _sizeFieldPos(_sizeFieldPos), _sizeFieldTag(_sizeFieldTag),
+        nFieldDefnCount(nFieldDefnCount), papoFieldDefns(papoFieldDefns), poRecord(poRecord), nCloneCount(nCloneCount), nMaxCloneCount(nMaxCloneCount), papoClones(papoClones);*/
 };
 
 /************************************************************************/
@@ -230,7 +243,7 @@ class CPL_ODLL DDFModule
  * as containers of the DDFSubfieldDefns.
  */
 
-class CPL_ODLL DDFFieldDefn
+class GEOS_DLL DDFFieldDefn
 {
   public:
                 DDFFieldDefn();
@@ -329,7 +342,7 @@ class CPL_ODLL DDFFieldDefn
  * data (as instances within a record).
  */
 
-class CPL_ODLL DDFSubfieldDefn
+class GEOS_DLL DDFSubfieldDefn
 {
 public:
 
@@ -436,7 +449,7 @@ private:
  * as a list of DDFField instances partitioning the raw data into fields.
  */
 
-class CPL_ODLL DDFRecord
+class GEOS_DLL DDFRecord
 {
   public:
                 DDFRecord( DDFModule * );
@@ -543,7 +556,7 @@ class CPL_ODLL DDFRecord
  * then use ExtractIntData(), ExtractFloatData() or ExtractStringData().
  */
 
-class CPL_ODLL DDFField
+class GEOS_DLL DDFField
 {
   public:
     void                Initialize( DDFFieldDefn *, const char *pszData,

@@ -10,7 +10,7 @@
 # See the COPYING file for more information.
 ################################################################################
 file(GLOB_RECURSE _sources ${CMAKE_CURRENT_LIST_DIR}/*.cpp CONFIGURE_DEPEND)
-add_executable(test_geos_unit ${_sources})
+add_executable(test_geos_unit ${_sources} "io/ISO8211Test.cpp")
 unset(_sources)
 
 find_package(Threads)

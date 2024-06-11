@@ -23,7 +23,7 @@
 #include <geos/geom/graphic/GraphicLayer.h>
 
 // std
-#include <dirent.h>
+// #include <dirent.h>
 #include <cmath>
 #include <memory>
 #include <string>
@@ -61,6 +61,20 @@ struct test_geom_graphic {
     
     }
 
+    void dealSOUNDG(const std::string& input, const std::string& output, double scale)
+    {
+        geos::geom::GraphicLayer* layer1 = new geos::geom::GraphicLayer();
+        layer1
+            ->setInputLayer(input + "Point_SOUNDG.geojson")
+            ->setGraphicAlgorithm(geos::geom::GraphicAlgorithm::Self)
+            ->setGraphicAuxiliary(geos::geom::GraphicAuxiliary::PointBuffer)
+            ->setScale(scale * 1)
+            ->excute()
+            ->makeOutputLayer(output + "Graphic_Polygon_SOUNDG.geojson");
+
+        delete layer1;
+    }
+
     void dealMIPARE(const std::string& input, const std::string& output, double scale)
     {
         geos::geom::GraphicLayer* layer1 = new geos::geom::GraphicLayer();
@@ -70,14 +84,22 @@ struct test_geom_graphic {
             ->setGraphicAuxiliary(geos::geom::GraphicAuxiliary::PolygonExteriorRingBuffer)
             ->setScale(scale)
             ->excute()
-            ->makeOutputLayer(output + "Polygon_MIPARE.geojson")
+            ->makeOutputLayer(output + "Graphic_Polygon_MIPARE.geojson")
             ->clear()
             ->setInputLayer(input + "Polygon_MIPARE.geojson")
             ->setGraphicAlgorithm(geos::geom::GraphicAlgorithm::Self)
             ->setGraphicAuxiliary(geos::geom::GraphicAuxiliary::PolygonExteriorRingBufferExteriorRing)
             ->setScale(scale)
             ->excute()
-            ->makeOutputLayer(output + "Polygon_Outline_MIPARE.geojson");
+            ->makeOutputLayer(output + "Graphic_Polygon_Outline_MIPARE.geojson")
+            ->clear()
+            ->setInputLayer(output + "Graphic_Polygon_Outline_MIPARE.geojson")
+            ->setAlgorithmLayer(output + "Graphic_Polygon_SOUNDG.geojson")
+            ->setGraphicAlgorithm(geos::geom::GraphicAlgorithm::Self)
+            ->setGraphicAuxiliary(geos::geom::GraphicAuxiliary::PointBuffer)
+            ->setScale(scale)
+            ->excute()
+            ->makeOutputLayer(output + "Graphic_Polygon_Outline_MIPARE.geojson");
 
         delete layer1;
     }
@@ -91,7 +113,7 @@ struct test_geom_graphic {
             ->setGraphicAuxiliary(geos::geom::GraphicAuxiliary::PolygonExteriorRingBuffer)
             ->setScale(scale)
             ->excute()
-            ->makeOutputLayer(output + "Polygon_LNDARE.geojson");
+            ->makeOutputLayer(output + "Graphic_Polygon_LNDARE.geojson");
 
         delete layer;
     }
@@ -105,7 +127,7 @@ struct test_geom_graphic {
             ->setGraphicAuxiliary(geos::geom::GraphicAuxiliary::PolygonExteriorRingBuffer)
             ->setScale(scale)
             ->excute()
-            ->makeOutputLayer(output + "Polygon_TSEZNE.geojson");
+            ->makeOutputLayer(output + "Graphic_Polygon_TSEZNE.geojson");
 
         delete layer;
     }
@@ -116,14 +138,14 @@ struct test_geom_graphic {
         layer1
             ->setInputLayer(input + "Polygon_MIPARE.geojson")
             ->setAlgorithmLayer(input + "Polygon_OBSTRN.geojson")
-            ->setAlgorithmLayer(input + "output/Polygon_LNDARE.geojson")
+            ->setAlgorithmLayer(input + "Polygon_LNDARE.geojson")
             ->setAlgorithmLayer(input + "Polygon_TSEZNE.geojson")
             ->setAlgorithmLayer(input + "Polygon_TSSLPT.geojson")
             ->setGraphicAlgorithm(geos::geom::GraphicAlgorithm::OtherDifference)
             ->setGraphicAuxiliary(geos::geom::GraphicAuxiliary::PolygonExteriorRingBuffer)
             ->setScale(scale)
             ->excute()
-            ->makeOutputLayer(output + "Polygon_Clip_MIPARE.geojson");
+            ->makeOutputLayer(output + "Graphic_Polygon_Clip_MIPARE.geojson");
         delete layer1;
 
     }
@@ -134,14 +156,15 @@ struct test_geom_graphic {
         layer1
             ->setInputLayer(input + "Polygon_MIPARE.geojson")
             ->setAlgorithmLayer(input + "Polygon_OBSTRN.geojson")
-            ->setAlgorithmLayer(output + "Polygon_LNDARE.geojson")
+            ->setAlgorithmLayer(output + "Graphic_Polygon_LNDARE.geojson")
             ->setAlgorithmLayer(input + "Polygon_TSEZNE.geojson")
             ->setAlgorithmLayer(input + "Polygon_TSSLPT.geojson")
+            ->setAlgorithmLayer(output + "Graphic_Polygon_SOUNDG.geojson")
             ->setGraphicAlgorithm(geos::geom::GraphicAlgorithm::OtherDifference)
             ->setGraphicAuxiliary(geos::geom::GraphicAuxiliary::PolygonExteriorRingBufferExteriorRing)
             ->setScale(scale)
             ->excute()
-            ->makeOutputLayer(output + "Polygon_Outline_Clip_MIPARE.geojson");
+            ->makeOutputLayer(output + "Graphic_Polygon_Outline_Clip_MIPARE.geojson");
         delete layer1;
     }
 
@@ -154,7 +177,7 @@ struct test_geom_graphic {
             ->setGraphicAuxiliary(geos::geom::GraphicAuxiliary::PolygonMaxLength)
             ->setScale(scale)
             ->excute()
-            ->makeOutputLayer(output + "Polygon_SEAARE.geojson");
+            ->makeOutputLayer(output + "Graphic_Polygon_SEAARE.geojson");
         delete layer1;
 
     }
@@ -168,7 +191,7 @@ struct test_geom_graphic {
             ->setGraphicAuxiliary(geos::geom::GraphicAuxiliary::PolygonMaxLengthCenter)
             ->setScale(scale)
             ->excute()
-            ->makeOutputLayer(output + "Polygon_Label_SEAARE.geojson");
+            ->makeOutputLayer(output + "Graphic_Polygon_Label_SEAARE.geojson");
         delete layer1;
 
     }
@@ -186,7 +209,7 @@ struct test_geom_graphic {
             ->setGraphicAuxiliary(geos::geom::GraphicAuxiliary::PolygonExteriorRingAndInteriorRingToExteriorRing)
             ->setScale(scale)
             ->excute()
-            ->makeOutputLayer(output + "LineString_RESARE.geojson");
+            ->makeOutputLayer(output + "Graphic_LineString_RESARE.geojson");
         delete layer1;
 
     }
@@ -199,11 +222,12 @@ struct test_geom_graphic {
             ->setAlgorithmLayer(input + "Polygon_LNDARE.geojson")
             ->setAlgorithmLayer(input + "Polygon_OBSTRN.geojson")
             ->setAlgorithmLayer(input + "Polygon_TSEZNE.geojson")
+            ->setAlgorithmLayer(output + "Graphic_Polygon_SOUNDG.geojson")
             ->setGraphicAlgorithm(geos::geom::GraphicAlgorithm::OtherDifference)
             ->setGraphicAuxiliary(geos::geom::GraphicAuxiliary::PolygonExteriorRingAndInteriorRingToExteriorRing)
             ->setScale(scale)
             ->excute()
-            ->makeOutputLayer(output + "Polygon_Outline_Clip_CTNARE.geojson");
+            ->makeOutputLayer(output + "Graphic_Polygon_Outline_Clip_CTNARE.geojson");
         delete layer1;
 
     }
@@ -221,7 +245,18 @@ struct test_geom_graphic {
             ->setGraphicAuxiliary(geos::geom::GraphicAuxiliary::PolygonExteriorRingToExteriorRing)
             ->setScale(scale)
             ->excute()
-            ->makeOutputLayer(output + "Polygon_Outline_Clip_PRCARE.geojson");
+            ->makeOutputLayer(output + "Graphic_Polygon_Outline_Clip_PRCARE.geojson")
+
+            ->clear()
+
+            ->setInputLayer(output + "Graphic_Polygon_Outline_MIPARE.geojson")
+            ->setAlgorithmLayer(output + "Graphic_Polygon_SOUNDG.geojson")
+            ->setGraphicAlgorithm(geos::geom::GraphicAlgorithm::OtherDifference)
+            ->setGraphicAuxiliary(geos::geom::GraphicAuxiliary::PointBuffer)
+            ->setScale(scale)
+            ->excute()
+            ->makeOutputLayer(output + "Graphic_Polygon_Outline_MIPARE.geojson");
+
         delete layer1;
     }
 
@@ -236,10 +271,11 @@ struct test_geom_graphic {
             ->setAlgorithmLayer(input + "Point_UWTROC.geojson")
             ->setAlgorithmLayer(input + "Point_BCNLAT.geojson")
             ->setAlgorithmLayer(input + "Point_BCNSPP.geojson")
+            ->setAlgorithmLayer(output + "Graphic_Polygon_SOUNDG.geojson")
             ->setGraphicAlgorithm(geos::geom::GraphicAlgorithm::OtherBufferDifference)
             ->setScale(2 * scale)
             ->excute()
-            ->makeOutputLayer(output + "LineString_Clip_COALNE.geojson");
+            ->makeOutputLayer(output + "Graphic_LineString_Clip_COALNE.geojson");
         delete layer1;
     }
 
@@ -255,7 +291,70 @@ struct test_geom_graphic {
             ->setGraphicAuxiliary(geos::geom::GraphicAuxiliary::PointBuffer)
             ->setScale(scale)
             ->excute()
-            ->makeOutputLayer(output + "Point_Outline_Union_OBSTRN.geojson");
+            ->makeOutputLayer(output + "Graphic_Point_Outline_Union_OBSTRN.geojson");
+        delete layer1;
+    }
+
+    void dealClip_DEPCNT(const std::string& input, const std::string& output, double scale)
+    {
+        geos::geom::GraphicLayer* layer1 = new geos::geom::GraphicLayer();
+        layer1
+            ->setInputLayer(input + "LineString_DEPCNT.geojson")
+            ->setGraphicAuxiliary(geos::geom::GraphicAuxiliary::LineDefault)
+            ->setAlgorithmLayer(output + "Graphic_Polygon_SOUNDG.geojson")
+            ->setGraphicAlgorithm(geos::geom::GraphicAlgorithm::OtherBufferDifference)
+            ->setScale(1.5 * scale)
+            ->excute()
+            ->makeOutputLayer(output + "Graphic_LineString_Clip_DEPCNT.geojson");
+        delete layer1;
+    }
+
+    void dealClip_BUAARE(const std::string& input, const std::string& output, double scale)
+    {
+        geos::geom::GraphicLayer* layer1 = new geos::geom::GraphicLayer();
+        layer1
+            ->setInputLayer(input + "Polygon_BUAARE.geojson")
+            ->setGraphicAuxiliary(geos::geom::GraphicAuxiliary::PolygonTranslate)
+            ->setAlgorithmLayer(input + "Polygon_BUAARE.geojson")
+            ->setGraphicAlgorithm(geos::geom::GraphicAlgorithm::OtherDifference)
+            ->setScale(scale)
+            ->setTranslate(scale / 4000, -scale / 4000)
+            ->excute()
+            ->makeOutputLayer(output + "Graphic_Polygon_BUAARE_Diff.geojson");
+
+            /*->clear()
+
+            ->setInputLayer(input + "Polygon_BUAARE.geojson")
+            ->setGraphicAuxiliary(geos::geom::GraphicAuxiliary::PolygonTranslate)
+            ->setAlgorithmLayer(input + "Polygon_BUAARE.geojson")
+            ->setGraphicAlgorithm(geos::geom::GraphicAlgorithm::OtherDifference)
+            ->setScale(scale)
+            ->setTranslate(0, -scale / 4000)
+            ->excute()
+            ->makeOutputLayer(output + "Graphic_Polygon_BUAARE_Diff_2.geojson")
+
+            ->clear()
+
+            ->setInputLayer(input + "Polygon_BUAARE.geojson")
+            ->setGraphicAuxiliary(geos::geom::GraphicAuxiliary::PolygonTranslate)
+            ->setAlgorithmLayer(input + "Polygon_BUAARE.geojson")
+            ->setGraphicAlgorithm(geos::geom::GraphicAlgorithm::OtherDifference)
+            ->setScale(scale)
+            ->setTranslate(scale / 4000, 0)
+            ->excute()
+            ->makeOutputLayer(output + "Graphic_Polygon_BUAARE_Diff_3.geojson")
+
+            ->clear()
+
+            ->setInputLayer(output + "Graphic_Polygon_BUAARE_Diff_1.geojson")
+            ->setGraphicAuxiliary(geos::geom::GraphicAuxiliary::PolygonDefault)
+            ->setAlgorithmLayer(output + "Graphic_Polygon_BUAARE_Diff_2.geojson")
+            ->setAlgorithmLayer(output + "Graphic_Polygon_BUAARE_Diff_3.geojson")
+            ->setGraphicAlgorithm(geos::geom::GraphicAlgorithm::OtherUnion)
+            ->setScale(scale)
+            ->excute()
+            ->makeOutputLayer(output + "Graphic_Polygon_BUAARE_Diff.geojson");*/
+
         delete layer1;
     }
 };
@@ -275,7 +374,7 @@ template<>
 void object::test<1>
 ()
 {
-    dealMIPARE("/mnt/d/geos/", "/mnt/d/geos/output/", 234270);
+    dealSOUNDG("/mnt/d/geos/", "/mnt/d/geos/output/", 868003);
 }
 
 // Test of Aree Buffer
@@ -284,25 +383,25 @@ template<>
 void object::test<2>
 ()
 {
-    dealLNDARE("/mnt/d/geos/", "/mnt/d/geos/output/", 234270);
+    dealMIPARE("/mnt/d/geos/", "/mnt/d/geos/output/", 868003);
 }
 
-// Test of Line Buffer
+// Test of Aree Buffer
 template<>
 template<>
 void object::test<3>
 ()
 {
-    dealTSEZNE("/mnt/d/geos/", "/mnt/d/geos/output/", 234270);
+    dealLNDARE("/mnt/d/geos/", "/mnt/d/geos/output/", 868003);
 }
 
-// Test of Aree Clip
+// Test of Line Buffer
 template<>
 template<>
 void object::test<4>
 ()
 {
-    dealClip_MIPARE("/mnt/d/geos/", "/mnt/d/geos/output/", 234270);
+    dealTSEZNE("/mnt/d/geos/", "/mnt/d/geos/output/", 868003);
 }
 
 // Test of Aree Clip
@@ -311,43 +410,43 @@ template<>
 void object::test<5>
 ()
 {
-    dealOutline_Clip_MIPARE("/mnt/d/geos/", "/mnt/d/geos/output/", 234270);
-}
-
-// Test of Area Max Lenth Line
-template<>
-template<>
-void object::test<6>
-()
-{
-    dealSEAARE("/mnt/d/geos/", "/mnt/d/geos/output/", 234270);
-}
-
-// Test of Area Max Lenth Line Center Point
-template<>
-template<>
-void object::test<7>
-()
-{
-    dealLabel_SEAARE("/mnt/d/geos/", "/mnt/d/geos/output/", 234270);
-}
-
-// Test of Split RESARE
-template<>
-template<>
-void object::test<8>
-()
-{
-    dealLineString_RESARE("/mnt/d/geos/", "/mnt/d/geos/output/", 234270);
+    dealClip_MIPARE("/mnt/d/geos/", "/mnt/d/geos/output/", 868003);
 }
 
 // Test of Aree Clip
 template<>
 template<>
+void object::test<6>
+()
+{
+    dealOutline_Clip_MIPARE("/mnt/d/geos/", "/mnt/d/geos/output/", 868003);
+}
+
+// Test of Area Max Lenth Line
+template<>
+template<>
+void object::test<7>
+()
+{
+    dealSEAARE("/mnt/d/geos/", "/mnt/d/geos/output/", 868003);
+}
+
+// Test of Area Max Lenth Line Center Point
+template<>
+template<>
+void object::test<8>
+()
+{
+    dealLabel_SEAARE("/mnt/d/geos/", "/mnt/d/geos/output/", 868003);
+}
+
+// Test of Split RESARE
+template<>
+template<>
 void object::test<9>
 ()
 {
-    dealOutline_Clip_CTNARE("/mnt/d/geos/", "/mnt/d/geos/output/", 234270);
+    dealLineString_RESARE("/mnt/d/geos/", "/mnt/d/geos/output/", 868003);
 }
 
 // Test of Aree Clip
@@ -356,33 +455,61 @@ template<>
 void object::test<10>
 ()
 {
-    dealOutline_Clip_PRCARE("/mnt/d/geos/", "/mnt/d/geos/output/", 234270);
+    dealOutline_Clip_CTNARE("/mnt/d/geos/", "/mnt/d/geos/output/", 868003);
+}
+
+// Test of Aree Clip
+template<>
+template<>
+void object::test<11>
+()
+{
+    dealOutline_Clip_PRCARE("/mnt/d/geos/", "/mnt/d/geos/output/", 868003);
 }
 
 
 // Test of Line Clip
 template<>
 template<>
-void object::test<11>
+void object::test<12>
 ()
 {
-    dealClip_COALNE("/mnt/d/geos/", "/mnt/d/geos/output/", 234270);
+    dealClip_COALNE("/mnt/d/geos/", "/mnt/d/geos/output/", 868003);
 }
 
 
 // Test of Point Union
 template<>
 template<>
-void object::test<12>
+void object::test<13>
 ()
 {
-    dealOutline_Union_OBSTRN("/mnt/d/geos/", "/mnt/d/geos/output/", 234270);
+    dealOutline_Union_OBSTRN("/mnt/d/geos/", "/mnt/d/geos/output/", 868003);
 }
+
+// Test of Point Union
+template<>
+template<>
+void object::test<14>
+()
+{
+    dealClip_DEPCNT("/mnt/d/geos/", "/mnt/d/geos/output/", 868003);
+}
+
+// Test of Point Union
+template<>
+template<>
+void object::test<15>
+()
+{
+    dealClip_BUAARE("/mnt/d/geos/", "/mnt/d/geos/output/", 868003);
+}
+
 
 //// Test of Aree Buffer
 //template<>
 //template<>
-//void object::test<13>
+//void object::test<14>
 //()
 //{
 //    std::string baseRoot("/mnt/d/GIS/gis/s57/data/graphic");
@@ -399,18 +526,18 @@ void object::test<12>
 //            std::string itemInputFolder = baseRoot + "/" + entry->d_name + "/Origin_3857/";
 //            std::string itemOutputFolder = baseRoot + "/" + entry->d_name + "/Graphic_3857/";
 //
-//            dealMIPARE(itemInputFolder, itemOutputFolder, 234270);
-//            dealLNDARE(itemInputFolder, itemOutputFolder, 234270);
-//            dealTSEZNE(itemInputFolder, itemOutputFolder, 234270);
-//            dealClip_MIPARE(itemInputFolder, itemOutputFolder, 234270);
-//            dealOutline_Clip_MIPARE(itemInputFolder, itemOutputFolder, 234270);
-//            dealSEAARE(itemInputFolder, itemOutputFolder, 234270);
-//            dealLabel_SEAARE(itemInputFolder, itemOutputFolder, 234270);
-//            dealLineString_RESARE(itemInputFolder, itemOutputFolder, 234270);
-//            dealOutline_Clip_CTNARE(itemInputFolder, itemOutputFolder, 234270);
-//            dealOutline_Clip_PRCARE(itemInputFolder, itemOutputFolder, 234270);
-//            dealClip_COALNE(itemInputFolder, itemOutputFolder, 234270);
-//            dealOutline_Union_OBSTRN(itemInputFolder, itemOutputFolder, 234270);
+//            dealMIPARE(itemInputFolder, itemOutputFolder, 868003);
+//            dealLNDARE(itemInputFolder, itemOutputFolder, 868003);
+//            dealTSEZNE(itemInputFolder, itemOutputFolder, 868003);
+//            dealClip_MIPARE(itemInputFolder, itemOutputFolder, 868003);
+//            dealOutline_Clip_MIPARE(itemInputFolder, itemOutputFolder, 868003);
+//            dealSEAARE(itemInputFolder, itemOutputFolder, 868003);
+//            dealLabel_SEAARE(itemInputFolder, itemOutputFolder, 868003);
+//            dealLineString_RESARE(itemInputFolder, itemOutputFolder, 868003);
+//            dealOutline_Clip_CTNARE(itemInputFolder, itemOutputFolder, 868003);
+//            dealOutline_Clip_PRCARE(itemInputFolder, itemOutputFolder, 868003);
+//            dealClip_COALNE(itemInputFolder, itemOutputFolder, 868003);
+//            dealOutline_Union_OBSTRN(itemInputFolder, itemOutputFolder, 868003);
 //        }
 //
 //    }

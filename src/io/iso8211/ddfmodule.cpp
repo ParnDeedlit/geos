@@ -757,3 +757,9 @@ void DDFModule::Rewind( long nOffset )
         poRecord->Clear();
         
 }
+
+
+//DDFModule::DDFModule(FILE* fpDDF, int bReadOnly, long nFirstRecordOffset, char _interchangeLevel, char _inlineCodeExtensionIndicator, char _versionNumber, char _appIndicator, int _fieldControlLength, char[4] _extendedCharSet, long _recLength, char _leaderIden, long _fieldAreaStart, long _sizeFieldLength, long _sizeFieldPos, long _sizeFieldTag, int nFieldDefnCount, DDFFieldDefn** papoFieldDefns, DDFRecord* poRecord, int nCloneCount, int nMaxCloneCount, DDFRecord** papoClones)
+//    : fpDDF(fpDDF), bReadOnly(bReadOnly), nFirstRecordOffset(nFirstRecordOffset), _interchangeLevel(_interchangeLevel), _inlineCodeExtensionIndicator(_inlineCodeExtensionIndicator), _versionNumber(_versionNumber), _appIndicator(_appIndicator), _fieldControlLength(_fieldControlLength), _extendedCharSet(_extendedCharSet), _recLength(_recLength), _leaderIden(_leaderIden), _fieldAreaStart(_fieldAreaStart), _sizeFieldLength(_sizeFieldLength), _sizeFieldPos(_sizeFieldPos), _sizeFieldTag(_sizeFieldTag), nFieldDefnCount(nFieldDefnCount), papoFieldDefns(papoFieldDefns), poRecord(poRecord), nCloneCount(nCloneCount), nMaxCloneCount(nMaxCloneCount), papoClones(papoClones)
+//{
+//}

@@ -144,6 +144,8 @@ namespace geos {
 
             GraphicLayer* setScale(double s);
 
+            GraphicLayer* setTranslate(double x, double y);
+
         private:
             GraphicLayer* excuteInputLayerBySelf();
             GraphicLayer* excuteInputLayerSplitSelf();
@@ -167,6 +169,8 @@ namespace geos {
             geos::io::GeoJSONWriter geojsonwriter;
             std::string outputPath;
             double scale;
+            double translatex;
+            double translatey;
             geos::algorithm::Orientation orientation;
         };
 
